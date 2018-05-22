@@ -2,8 +2,8 @@
 //  main.cpp
 //  Proyecto3D
 //
-//  Created by Iván Velazquez Reyes on 20/05/18.
-//  Copyright © 2018 Iván Velazquez Reyes. All rights reserved.
+//
+//
 //
 
 #include <stdio.h>

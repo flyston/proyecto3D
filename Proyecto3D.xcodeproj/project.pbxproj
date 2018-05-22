@@ -10,6 +10,8 @@
 		2C443E7920B1DEA000FB7370 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C443E7820B1DEA000FB7370 /* main.cpp */; };
 		2C443E8120B1DEA800FB7370 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C443E8020B1DEA800FB7370 /* OpenGL.framework */; };
 		2C443E8320B1DEBC00FB7370 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C443E8220B1DEBC00FB7370 /* GLUT.framework */; };
+		F379BC9F20B49FA4002A8ACC /* GLUT.framework in Sources */ = {isa = PBXBuildFile; fileRef = 2C443E8220B1DEBC00FB7370 /* GLUT.framework */; };
+		F379BCA020B49FA4002A8ACC /* OpenGL.framework in Sources */ = {isa = PBXBuildFile; fileRef = 2C443E8020B1DEA800FB7370 /* OpenGL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -134,6 +136,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F379BC9F20B49FA4002A8ACC /* GLUT.framework in Sources */,
+				F379BCA020B49FA4002A8ACC /* OpenGL.framework in Sources */,
 				2C443E7920B1DEA000FB7370 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -254,7 +258,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 53KZ8FTV57;
+				DEVELOPMENT_TEAM = 8364D6KN4J;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -263,7 +267,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 53KZ8FTV57;
+				DEVELOPMENT_TEAM = 8364D6KN4J;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
