@@ -13,7 +13,13 @@
 #include <GLut/gutil.h>
 #include <GLut/glut.h>
 #include <Opengl/gl.h>
-int alto=256,ancho=256;
+
+#include "/Users/ivan/Downloads/glm.h"
+#include "/Users/ivan/Downloads/glm.c"
+
+GLMmodel* model;
+
+int alto=256, ancho=256, ferrari=0, ancho1=1024 ,alto1=1024;
 GLfloat angle = 0;
 GLfloat angle2 = 0;
 int moving, startx, starty;
@@ -24,8 +30,19 @@ unsigned char * datos2;
 unsigned char * datos3;
 unsigned char * datos4;
 unsigned char * datos5;
+unsigned char * imagenTextura;
 
 int leerImagen(){
+    
+    FILE *imagenModelo;
+    imagenModelo=fopen("/Users/ivan/Downloads/Archivo/bowling pin/bowling_pin_000.mtl","r");
+    imagenTextura=(unsigned char*)malloc(ancho1*alto1*3);
+    if(imagenModelo==NULL){
+        printf("Sin imagen");
+        return 0;
+    }
+    fread(imagenTextura,ancho1*alto1*3,1,imagenModelo);
+    fclose(imagenModelo);
     
     FILE *imagen;
     imagen=fopen("/Users/ivan/Desktop/L1.data","r");
@@ -90,6 +107,11 @@ int leerImagen(){
     return 1;
 }
 
+void aplicaTextura(void) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, imagenTextura);
+}
 
 void usarL1(void) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -99,25 +121,21 @@ void usarL1(void) {
 void usarL2(void){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, datos1);
-    
 }
 
 void usarL3(void){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, datos2);
-    
 }
 
 void usarL4(void){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, datos3);
-    
 }
 
 void usarSuelo(void){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, datos4);
-    
 }
 
 void usarTapa(void){
@@ -125,6 +143,18 @@ void usarTapa(void){
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, datos5);
     
 }
+
+void dibujaModelo() {
+    
+    if (ferrari==1)
+        glRotatef(-90, 1.0, 0.0, 0.0);
+    
+    glmUnitize(model);
+    glmScale(model, 0.95);
+    
+    glmDraw(model,GLUT_DOUBLE|GLM_SMOOTH | GLM_MATERIAL|GLM_TEXTURE);
+}
+
 // cubemap variables
 int d1=10;
 int d2=20;
@@ -252,6 +282,8 @@ void display(void) {
     glRotatef(angle2, 1.0, 0.0, 0.0); //move mouse
     glRotatef(angle, 0.0, 1.0, 0.0);
     
+    dibujaModelo();
+    
     glPushMatrix();
     glTranslatef(0,-10, 0);
     glEnable(GL_TEXTURE_2D);
@@ -297,26 +329,57 @@ void mover(int x, int y) {
     }
 }
 
+void init(){
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    
+    gluPerspective(60, 1, 1, 50);
+    
+    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    
+    glEnable(GL_TEXTURE_2D);
+    
+    glClearColor(0.4, 0.7, 0.99, 1);
+    
+    float pos[4]={1,1,0,1};
+    glLightfv(GL_LIGHT0, GL_POSITION, pos);
+    glTranslatef(0, 0, -2);
+}
+
+
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
     
     glutInitWindowSize(640,480);
     
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
+    
+    glutInitWindowSize(640,640);
+    glutInitWindowPosition(200, 0);
+
     glutCreateWindow("Cubo Entorno");
     
     glutDisplayFunc(display);
     glutMouseFunc(mouse);
     glutMotionFunc(mover);
     
+    init();
+    
+    model = glmReadOBJ("/Users/ivan/Downloads/Archivo/bowling pin/bowling_pin_000.obj");
+    glmReadMTL(model,"bowling_pin_000.mtl");
     
     gluPerspective(40.0,1.333,0.1,200.0); //16/10=1.6   5/4=1.25
     glMatrixMode(GL_MODELVIEW);
-    gluLookAt(0.0, 0.0, 10.0,  /* camara en (0,20,60) */
+    gluLookAt(0.0, 0.0, 60.0,  /* camara en (0,20,60) */
               0,0,0,          /* mira a (x,y,z) */
               0, 1, 0);      /* altura en Y (0,1,0) o en x Y (1,0,0) */
     
     leerImagen();
+    aplicaTextura();
     glutMainLoop();
     return 0;
 }
