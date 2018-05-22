@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2C443E7920B1DEA000FB7370 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2C443E7820B1DEA000FB7370 /* main.cpp */; };
+		2C443E8120B1DEA800FB7370 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C443E8020B1DEA800FB7370 /* OpenGL.framework */; };
+		2C443E8320B1DEBC00FB7370 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C443E8220B1DEBC00FB7370 /* GLUT.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,8 @@
 /* Begin PBXFileReference section */
 		2C443E7520B1DEA000FB7370 /* Proyecto3D */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Proyecto3D; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C443E7820B1DEA000FB7370 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		2C443E8020B1DEA800FB7370 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		2C443E8220B1DEBC00FB7370 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +36,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C443E8320B1DEBC00FB7370 /* GLUT.framework in Frameworks */,
+				2C443E8120B1DEA800FB7370 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -43,6 +49,7 @@
 			children = (
 				2C443E7720B1DEA000FB7370 /* Proyecto3D */,
 				2C443E7620B1DEA000FB7370 /* Products */,
+				2C443E7F20B1DEA800FB7370 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -60,6 +67,15 @@
 				2C443E7820B1DEA000FB7370 /* main.cpp */,
 			);
 			path = Proyecto3D;
+			sourceTree = "<group>";
+		};
+		2C443E7F20B1DEA800FB7370 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2C443E8220B1DEBC00FB7370 /* GLUT.framework */,
+				2C443E8020B1DEA800FB7370 /* OpenGL.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
