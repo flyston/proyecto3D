@@ -1,10 +1,3 @@
-//
-//  main.cpp
-//  Proyecto3D
-//
-//
-//
-//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,145 +12,185 @@
 
 GLMmodel* model;
 
-int alto=256, ancho=256, ferrari=0, ancho1=1024 ,alto1=1024;
+int alto=200,ancho=200;
+int altoM=1024,anchoM=1024;//dim imagen
 GLfloat angle = 0;
 GLfloat angle2 = 0;
 int moving, startx, starty;
+int ferrari=0;
 
-unsigned char * datos;
-unsigned char * datos1;
-unsigned char * datos2;
-unsigned char * datos3;
-unsigned char * datos4;
-unsigned char * datos5;
-unsigned char * imagenTextura;
 
-int leerImagen(){
-    
-    FILE *imagenModelo;
-    imagenModelo=fopen("/Users/valentinmedina/Documents/proyecto3D/bowling pin/Hongo.data","r");
-    imagenTextura=(unsigned char*)malloc(ancho1*alto1*3);
-    if(imagenModelo==NULL){
-        printf("Sin imagen");
-        return 0;
-    }
-    fread(imagenTextura,ancho1*alto1*3,1,imagenModelo);
-    fclose(imagenModelo);
-    
-    FILE *imagen;
-    imagen=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared1.data","r");
-    datos=(unsigned char*)malloc(ancho*alto*3);
-    if(imagen==NULL){
-        printf("Error: No imagen");
-        return 0;
-    }
-    fread(datos,ancho*alto*3,1,imagen);
-    fclose(imagen);
-    
-    FILE *imagen1;
-    imagen1=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared2.data","r");
-    datos1=(unsigned char*)malloc(ancho*alto*3);
-    if(imagen1==NULL){
-        printf("Error: No imagen");
-        return 0;
-    }
-    fread(datos1,ancho*alto*3,1,imagen1);
-    fclose(imagen1);
-    
-    FILE *imagen2;
-    imagen2=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared3.data","r");
-    datos2=(unsigned char*)malloc(ancho*alto*3);
-    if(imagen2==NULL){
-        printf("Error: No imagen");
-        return 0;
-    }
-    fread(datos2,ancho*alto*3,1,imagen2);
-    fclose(imagen2);
-    
-    FILE *imagen3;
-    imagen3=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared4.data","r");
-    datos3=(unsigned char*)malloc(ancho*alto*3);
-    if(imagen3==NULL){
-        printf("Error: No imagen");
-        return 0;
-    }
-    fread(datos3,ancho*alto*3,1,imagen3);
-    fclose(imagen3);
-    
-    FILE *imagen4;
-    imagen4=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/tapa.data","r");
-    datos4=(unsigned char*)malloc(ancho*alto*3);
-    if(imagen4==NULL){
-        printf("Error: No imagen");
-        return 0;
-    }
-    fread(datos4,ancho*alto*3,1,imagen4);
-    fclose(imagen4);
-    
-    FILE *imagen5;
-    imagen5=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/base.data","r");
-    datos5=(unsigned char*)malloc(ancho*alto*3);
-    if(imagen5==NULL){
-        printf("Error: No imagen");
-        return 0;
-    }
-    fread(datos5,ancho*alto*3,1,imagen5);
-    fclose(imagen5);
-    
-    return 1;
-}
 
-void aplicaTextura(void) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, imagenTextura);
-}
 
-void usarL1(void) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, datos);
-}
+unsigned char * textura;
+unsigned char * textura2;
+unsigned char * textura3;
+unsigned char * textura4;
+unsigned char * textura5;
+unsigned char * textura6;
+unsigned char * imagenTexturaM;
 
-void usarL2(void){
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, datos1);
-}
-
-void usarL3(void){
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, datos2);
-}
-
-void usarL4(void){
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, datos3);
-}
-
-void usarSuelo(void){
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, datos4);
-}
-
-void usarTapa(void){
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, datos5);
-    
-}
-
-void dibujaModelo() {
+void dibujaModelo(){
     
     if (ferrari==1)
         glRotatef(-90, 1.0, 0.0, 0.0);
     
     glmUnitize(model);
-    glmScale(model, 0.95);
+    glmScale(model, 4.90);
     
     glmDraw(model,GLUT_DOUBLE|GLM_SMOOTH | GLM_MATERIAL|GLM_TEXTURE);
 }
 
+
+int leerImagen(){
+    FILE *imagen;
+    imagen=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/base.data","r");
+    textura=(unsigned char*)malloc(ancho*alto*3);
+    if(imagen==NULL){
+        printf("Error: No imagen");
+        return 0;
+    }
+    fread(textura,ancho*alto*3,1,imagen);
+    fclose(imagen);
+    return 1;
+}
+
+int leerImagen2(){
+    FILE *imagen;
+    imagen=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared1.data","r");
+    textura2=(unsigned char*)malloc(ancho*alto*3);
+    if(imagen==NULL){
+        printf("Error: No imagen");
+        return 0;
+    }
+    fread(textura2,ancho*alto*3,1,imagen);
+    fclose(imagen);
+    return 1;
+    
+}
+
+int leerImagen3(){
+    FILE *imagen;
+    imagen=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared2.data","r");
+    textura3=(unsigned char*)malloc(ancho*alto*3);
+    if(imagen==NULL){
+        printf("Error: No imagen");
+        return 0;
+    }
+    fread(textura3,ancho*alto*3,1,imagen);
+    fclose(imagen);
+    return 1;
+    
+}
+
+int leerImagen4(){
+    FILE *imagen;
+    imagen=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared3.data","r");
+    textura4=(unsigned char*)malloc(ancho*alto*3);
+    if(imagen==NULL){
+        printf("Error: No imagen");
+        return 0;
+    }
+    fread(textura4,ancho*alto*3,1,imagen);
+    fclose(imagen);
+    return 1;
+    
+}
+
+
+int leerImagen5(){
+    FILE *imagen;
+    imagen=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared4.data","r");
+    textura5=(unsigned char*)malloc(ancho*alto*3);
+    if(imagen==NULL){
+        printf("Error: No imagen");
+        return 0;
+    }
+    fread(textura5,ancho*alto*3,1,imagen);
+    fclose(imagen);
+    return 1;
+    
+}
+
+int leerImagen6(){
+    FILE *imagen;
+    imagen=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/tapa.data","r");
+    textura6=(unsigned char*)malloc(ancho*alto*3);
+    if(imagen==NULL){
+        printf("Error: No imagen");
+        return 0;
+    }
+    fread(textura6,ancho*alto*3,1,imagen);
+    fclose(imagen);
+    return 1;
+    
+}
+
+
+
+int leerImagenM(){
+    FILE *imagen;
+    imagen=fopen("/Users/valentinmedina/Documents/proyecto3D/bowling pin/Hongo.data","r");
+    imagenTexturaM=(unsigned char*)malloc(anchoM*altoM*3);
+    if(imagen==NULL){
+        printf("Sin imagen");
+        return 0;
+    }
+    fread(imagenTexturaM,anchoM*altoM*3,1,imagen);
+    fclose(imagen);
+    return 1;
+}
+
+void aplicaTexturaM(void)
+{
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, anchoM, altoM, 0, GL_RGB, GL_UNSIGNED_BYTE, imagenTexturaM);
+}
+
+
+void usarTextura(void) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, textura);
+}
+
+void usarTextura2(void){
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, textura2);
+    
+}
+
+void usarTextura3(void){
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, textura3);
+    
+}
+
+void usarTextura4(void){
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, textura4);
+    
+}
+void usarTextura5(void){
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, textura5);
+    
+}
+
+void usarTextura6(void){
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, textura6);
+    
+}
+
 // cubemap variables
-int d1=10;
-int d2=20;
+int d1=20;
+int d2=40;
 static GLint verticesPiso[4][3] = {
     { -d1, 0,  -d1 },
     {  d1, 0,  -d1 },
@@ -183,18 +216,33 @@ static GLint pared3Vertices[4][3] = {
     { -d1,0,-d1 },
     {  -d1,d2,-d1},
 };
-static GLint pared4Vertices[4][3] = {
-    { -d1,d2,-d1},
-    { -d1,0,-d1 },
-    {  -d1,0,d1 },
-    {  -d1,d2,d1},
-};
+/*static GLint pared4Vertices[4][3] = {
+ { -d1,d2,-d1},
+ { -d1,0,-d1 },
+ {  -d1,0,d1 },
+ {  -d1,d2,d1},
+ };*/
 static GLint techoVertices[4][3] = {
     { d1,d2,-d1},
     { -d1,d2,-d1 },
     {  -d1,d2,d1 },
     {  d1,d2,d1},
+    
+    
 };
+
+void dibujaBase(void) {
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3iv(verticesPiso[0]);
+    glTexCoord2f(0.0, 1);
+    glVertex3iv(verticesPiso[1]);
+    glTexCoord2f(1, 1);
+    glVertex3iv(verticesPiso[2]);
+    glTexCoord2f(1, 0.0);
+    glVertex3iv(verticesPiso[3]);
+    glEnd();
+}
 
 void dibujaPared1c(void) {
     glBegin(GL_QUADS);
@@ -235,77 +283,75 @@ void dibujaPared3c(void) {
     glEnd();
 }
 
-void dibujaPared4c(void) {
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3iv(pared4Vertices[0]);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3iv(pared4Vertices[1]);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3iv(pared4Vertices[2]);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3iv(pared4Vertices[3]);
-    glEnd();
-}
-
-void dibujaBase(void) {
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3iv(verticesPiso[2]);
-    glTexCoord2f(0.0, 1);
-    glVertex3iv(verticesPiso[3]);
-    glTexCoord2f(1, 1);
-    glVertex3iv(verticesPiso[0]);
-    glTexCoord2f(1, 0.0);
-    glVertex3iv(verticesPiso[1]);
-    glEnd();
-}
+/*void dibujaPared4c(void) {
+ glBegin(GL_QUADS);
+ glTexCoord2f(0.0, 0.0);
+ glVertex3iv(pared4Vertices[0]);
+ glTexCoord2f(0.0, 1.0);
+ glVertex3iv(pared4Vertices[1]);
+ glTexCoord2f(1.0, 1.0);
+ glVertex3iv(pared4Vertices[2]);
+ glTexCoord2f(1.0, 0.0);
+ glVertex3iv(pared4Vertices[3]);
+ glEnd();
+ }*/
 
 void dibujaTapac(void) {
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0);
-    glVertex3iv(techoVertices[2]);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3iv(techoVertices[3]);
-    glTexCoord2f(1.0, 1.0);
     glVertex3iv(techoVertices[0]);
-    glTexCoord2f(1.0, 0.0);
+    glTexCoord2f(0.0, 1.0);
     glVertex3iv(techoVertices[1]);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3iv(techoVertices[2]);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3iv(techoVertices[3]);
     glEnd();
 }
+//////////////////////////////////////////////////
 
 void display(void) {
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    
     glPushMatrix();
     glRotatef(angle2, 1.0, 0.0, 0.0); //move mouse
     glRotatef(angle, 0.0, 1.0, 0.0);
+    //Hongo 1
+    glPushMatrix();
+    glTranslatef(-40, -5, 0);
+    glRotatef(90, 0, 1, 0);
+    aplicaTexturaM();
+    dibujaModelo();
+    glPopMatrix();
+    //Hongo2
+    glPushMatrix();
+    glTranslatef(-40, -5, 10);
+    glRotatef(90, 0, 1, 0);
+    aplicaTexturaM();
+    dibujaModelo();
+    glPopMatrix();
     
-
+    glPushMatrix();
     
     glPushMatrix();
     glTranslatef(0,-10, 0);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
-    glPushMatrix();
-    glTranslatef(0,5, 0);
-    dibujaModelo();
-    glPopMatrix();
-    usarSuelo();
-    dibujaBase();
-    usarL1();
+    usarTextura();
+    dibujaBase();//Base
+    usarTextura2();
     dibujaPared1c();
-    usarL2();
+    usarTextura3();
     dibujaPared2c();
-    usarL3();
+    usarTextura4();
     dibujaPared3c();
-    usarL4();
-    dibujaPared4c();
-    usarTapa();
-    dibujaTapac();
+    usarTextura5();
+    //dibujaPared4c();
+    usarTextura6();
+    dibujaTapac();//tapa
     glPopMatrix();
     
+    glPopMatrix();
     glPopMatrix();
     glutSwapBuffers();
 }
@@ -336,9 +382,13 @@ void mover(int x, int y) {
 void init(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    gluPerspective(100, 1, 1,200);
     glMatrixMode(GL_MODELVIEW);
+    gluLookAt(0.0, 0.0,10.0,  /* camara en (0,20,60) */
+              0,0,0,          /* mira a (x,y,z) */
+              0, 1, 0);/* altura en Y (0,1,0) o en x Y (1,0,0)*/
     
-    gluPerspective(60, 1, 1, 50);
+    
     
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_LIGHTING);
@@ -358,32 +408,35 @@ int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
     
-    glutInitWindowSize(640,480);
-    
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
-    
     glutInitWindowSize(640,640);
-    glutInitWindowPosition(200, 0);
-
-    glutCreateWindow("Cubo Entorno");
+    
+    glutCreateWindow("Tarea Entorno");
     
     glutDisplayFunc(display);
     glutMouseFunc(mouse);
     glutMotionFunc(mover);
     
+    
+    //gluPerspective(40,1,1,60); //16/10=1.6   5/4=1.25
+    //glMatrixMode(GL_MODELVIEW);
+    
+    
+    
+    
     init();
+    
+    
     
     model = glmReadOBJ("/Users/valentinmedina/Documents/proyecto3D/bowling pin/Hongo.obj");
     glmReadMTL(model,"Hongo.mtl");
     
-    gluPerspective(40.0,1.333,0.1,200.0); //16/10=1.6   5/4=1.25
-    glMatrixMode(GL_MODELVIEW);
-    gluLookAt(0.0, 0.0, 60.0,  /* camara en (0,20,60) */
-              0,0,0,          /* mira a (x,y,z) */
-              0, 1, 0);      /* altura en Y (0,1,0) o en x Y (1,0,0) */
-    
     leerImagen();
-    aplicaTextura();
+    leerImagen2();
+    leerImagen3();
+    leerImagen4();
+    leerImagen5();
+    leerImagen6();
+    leerImagenM();
     glutMainLoop();
     return 0;
 }
