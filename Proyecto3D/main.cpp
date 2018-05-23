@@ -14,8 +14,8 @@
 #include <GLut/glut.h>
 #include <Opengl/gl.h>
 
-#include "/Users/ivan/Downloads/glm.h"
-#include "/Users/ivan/Downloads/glm.c"
+#include "/Users/valentinmedina/Downloads/glm.h"
+#include "/Users/valentinmedina/Downloads/glm.c"
 
 GLMmodel* model;
 
@@ -35,7 +35,7 @@ unsigned char * imagenTextura;
 int leerImagen(){
     
     FILE *imagenModelo;
-    imagenModelo=fopen("/Users/ivan/Downloads/Archivo/bowling pin/bowling_pin_000.mtl","r");
+    imagenModelo=fopen("/Users/valentinmedina/Documents/proyecto3D/bowling pin/Hongo.data","r");
     imagenTextura=(unsigned char*)malloc(ancho1*alto1*3);
     if(imagenModelo==NULL){
         printf("Sin imagen");
@@ -45,7 +45,7 @@ int leerImagen(){
     fclose(imagenModelo);
     
     FILE *imagen;
-    imagen=fopen("/Users/ivan/Desktop/L1.data","r");
+    imagen=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared1.data","r");
     datos=(unsigned char*)malloc(ancho*alto*3);
     if(imagen==NULL){
         printf("Error: No imagen");
@@ -55,7 +55,7 @@ int leerImagen(){
     fclose(imagen);
     
     FILE *imagen1;
-    imagen1=fopen("/Users/ivan/Desktop/L2.data","r");
+    imagen1=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared2.data","r");
     datos1=(unsigned char*)malloc(ancho*alto*3);
     if(imagen1==NULL){
         printf("Error: No imagen");
@@ -65,7 +65,7 @@ int leerImagen(){
     fclose(imagen1);
     
     FILE *imagen2;
-    imagen2=fopen("/Users/ivan/Desktop/L3.data","r");
+    imagen2=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared3.data","r");
     datos2=(unsigned char*)malloc(ancho*alto*3);
     if(imagen2==NULL){
         printf("Error: No imagen");
@@ -75,7 +75,7 @@ int leerImagen(){
     fclose(imagen2);
     
     FILE *imagen3;
-    imagen3=fopen("/Users/ivan/Desktop/L4.data","r");
+    imagen3=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/pared4.data","r");
     datos3=(unsigned char*)malloc(ancho*alto*3);
     if(imagen3==NULL){
         printf("Error: No imagen");
@@ -85,7 +85,7 @@ int leerImagen(){
     fclose(imagen3);
     
     FILE *imagen4;
-    imagen4=fopen("/Users/ivan/Desktop/Suelo.data","r");
+    imagen4=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/tapa.data","r");
     datos4=(unsigned char*)malloc(ancho*alto*3);
     if(imagen4==NULL){
         printf("Error: No imagen");
@@ -95,7 +95,7 @@ int leerImagen(){
     fclose(imagen4);
     
     FILE *imagen5;
-    imagen5=fopen("/Users/ivan/Desktop/Tapa.data","r");
+    imagen5=fopen("/Users/valentinmedina/Desktop/ImagenesBruto/base.data","r");
     datos5=(unsigned char*)malloc(ancho*alto*3);
     if(imagen5==NULL){
         printf("Error: No imagen");
@@ -282,12 +282,16 @@ void display(void) {
     glRotatef(angle2, 1.0, 0.0, 0.0); //move mouse
     glRotatef(angle, 0.0, 1.0, 0.0);
     
-    dibujaModelo();
+
     
     glPushMatrix();
     glTranslatef(0,-10, 0);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
+    glPushMatrix();
+    glTranslatef(0,5, 0);
+    dibujaModelo();
+    glPopMatrix();
     usarSuelo();
     dibujaBase();
     usarL1();
@@ -369,8 +373,8 @@ int main(int argc, char **argv) {
     
     init();
     
-    model = glmReadOBJ("/Users/ivan/Downloads/Archivo/bowling pin/bowling_pin_000.obj");
-    glmReadMTL(model,"bowling_pin_000.mtl");
+    model = glmReadOBJ("/Users/valentinmedina/Documents/proyecto3D/bowling pin/Hongo.obj");
+    glmReadMTL(model,"Hongo.mtl");
     
     gluPerspective(40.0,1.333,0.1,200.0); //16/10=1.6   5/4=1.25
     glMatrixMode(GL_MODELVIEW);
