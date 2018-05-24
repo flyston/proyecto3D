@@ -11,13 +11,16 @@
 #include "/Users/ivan/Downloads/glm.c"
 
 GLMmodel* model;
-GLMmodel* model1;
+GLMmodel* bola;
+GLMmodel* flecha;
 
 int alto=256,ancho=256;
 int altoM=1024,anchoM=1024;//dim imagen
 GLfloat angle = 0;
 GLfloat angle2 = 0;
-int moving, startx, starty, ferrari=0, ferrari1=0;
+int moving, startx, starty, ferrari=0, band=1, bandTimer=1;
+int rotarFlecha=-90, direccionBola=0;
+float i=-65;
 
 unsigned char * textura;
 unsigned char * textura2;
@@ -26,7 +29,9 @@ unsigned char * textura4;
 unsigned char * textura5;
 unsigned char * textura6;
 unsigned char * imagenTexturaM;
-unsigned char * imagenTexturaM1;
+unsigned char * imagenTexturaBola;
+unsigned char * imagenTexturaFlecha;
+
 
 int leerImagen(){
     FILE *imagen;
@@ -101,13 +106,24 @@ int leerImagen(){
     
     FILE *imagen7;
     imagen7=fopen("/Users/ivan/Desktop/toastmap.data","r");
-    imagenTexturaM1=(unsigned char*)malloc(anchoM*altoM*3);
+    imagenTexturaBola=(unsigned char*)malloc(anchoM*altoM*3);
     if(imagen7==NULL){
         printf("Sin imagen");
         return 0;
     }
-    fread(imagenTexturaM1,anchoM*altoM*3,1,imagen7);
+    fread(imagenTexturaBola,anchoM*altoM*3,1,imagen7);
     fclose(imagen7);
+    
+    FILE *imagen8;
+    imagen8=fopen("/Users/ivan/Desktop/flecha.data","r");
+    imagenTexturaFlecha=(unsigned char*)malloc(anchoM*altoM*3);
+    if(imagen8==NULL){
+        printf("Sin imagen");
+        return 0;
+    }
+    fread(imagenTexturaFlecha,anchoM*altoM*3,1,imagen8);
+    fclose(imagen8);
+    
     return 1;
 }
 
@@ -117,31 +133,26 @@ void usarTextura(void) {
 }
 
 void usarTextura2(void){
-    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, textura2);
 }
 
 void usarTextura3(void){
-    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, textura3);
 }
 
 void usarTextura4(void){
-    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, textura4);
 }
 
 void usarTextura5(void){
-    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, textura5);
 }
 
 void usarTextura6(void){
-    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ancho, alto, 0, GL_RGB, GL_UNSIGNED_BYTE, textura6);
 }
@@ -152,10 +163,16 @@ void aplicaTexturaM(void) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, anchoM, altoM, 0, GL_RGB, GL_UNSIGNED_BYTE, imagenTexturaM);
 }
 
-void aplicaTexturaM1(void) {
+void aplicaTexturaBola(void) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, anchoM, altoM, 0, GL_RGB, GL_UNSIGNED_BYTE, imagenTexturaM1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, anchoM, altoM, 0, GL_RGB, GL_UNSIGNED_BYTE, imagenTexturaBola);
+}
+
+void aplicaTexturaFlecha(void) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, anchoM, altoM, 0, GL_RGB, GL_UNSIGNED_BYTE, imagenTexturaFlecha);
 }
 
 // cubemap variables
@@ -282,44 +299,38 @@ void dibujaBase(void) {
     glEnd();
 }
 
-void iluminacion (int encendido){
-    if(encendido==1) {
-        const GLfloat pos[4]={10, 10, 10};//poner afuera
-        glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
-        glLightfv(GL_LIGHT0, GL_POSITION, pos);
-        
-    }else{
-        glDisable(GL_LIGHTING);}
+void timer(int value) {
+    
 }
 
-void aplicarMaterial(int encendido) {
-    iluminacion(1);
-    if(encendido==1) {
-        GLfloat mat_green_ambient[] = { 0.0,0.0,0.0,1.0};
-        GLfloat mat_green_diffuse[] = { 0.5,0.0,0.0,1.0};
-        GLfloat mat_specular[] = { 0.7,0.6,0.6,1.0};
-        GLfloat mat_emission[] = { 0.0,0.0,0.0,0};
-        
-        GLfloat mat_shininess[] = {32};
-        
-        glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-        glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-        glMaterialfv(GL_FRONT, GL_AMBIENT, mat_green_ambient);
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_green_diffuse);
-        glMaterialfv(GL_FRONT, GL_EMISSION, mat_emission);
+void timerFunc(int value) {
+    if (bandTimer==1) {
+        glutTimerFunc(50, timerFunc, 0);
+        switch (band) {
+            case 1:
+                rotarFlecha-=1;
+                if (rotarFlecha<-110) {
+                    band=0;
+                }
+                break;
+            case 0:
+                rotarFlecha+=1;
+                if (rotarFlecha>-70) {
+                    band=1;
+                }
+                break;
+                
+            default:
+                break;
+        }
+    } else {
+        glutTimerFunc(50, timerFunc, 0);
+        if (i<15) {
+            i+=5;
+        }
     }
+    glutPostRedisplay();
 }
-
-/*void transparencia (int encendido) {
-    if(encendido==1) {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDisable(GL_DEPTH_TEST);
-    }else{
-        glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST); }
-}*/
 
 void dibujaModelo(){
     if (ferrari==1)
@@ -331,112 +342,24 @@ void dibujaModelo(){
     glmDraw(model,GLUT_DOUBLE|GLM_SMOOTH | GLM_MATERIAL|GLM_TEXTURE);
 }
 
-void dibujaModelo1(){
-    if (ferrari1==1)
+void dibujaModeloBola(){
+    if (ferrari==1)
         glRotatef(-90, 1.0, 0.0, 0.0);
     
-    glmUnitize(model1);
-    glmScale(model1, 4.0);
+    glmUnitize(bola);
+    glmScale(bola, 4.0);
     
-    glmDraw(model1,GLUT_DOUBLE|GLM_SMOOTH | GLM_MATERIAL|GLM_TEXTURE);
+    glmDraw(bola,GLUT_DOUBLE|GLM_SMOOTH | GLM_MATERIAL|GLM_TEXTURE);
 }
 
-void display(void) {
+void dibujaModeloFlecha(){
+    if (ferrari==1)
+        glRotatef(-90, 1.0, 0.0, 0.0);
     
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glmUnitize(flecha);
+    glmScale(flecha, 8.0);
     
-    glPushMatrix();
-        glRotatef(angle2, 1.0, 0.0, 0.0); //move mouse
-        glRotatef(angle, 0.0, 1.0, 0.0);
-    
-        //bola
-        glPushMatrix();
-            glTranslatef(0, -6, -25);
-            glRotatef(90, 0, 1, 0);
-            aplicaTexturaM1();
-            dibujaModelo1();
-        glPopMatrix();
-    
-        //bolo1
-        glPushMatrix();
-            glTranslatef(8, -7, 10);
-            glRotatef(90, 0, 1, 0);
-            aplicaTexturaM();
-            dibujaModelo();
-        glPopMatrix();
-    
-        //bolo2
-        glPushMatrix();
-            glTranslatef(0, -7, 10);
-            glRotatef(90, 0, 1, 0);
-            aplicaTexturaM();
-            dibujaModelo();
-        glPopMatrix();
-    
-        //bolo3
-        glPushMatrix();
-            glTranslatef(-8, -7, 10);
-            glRotatef(90, 0, 1, 0);
-            aplicaTexturaM();
-            dibujaModelo();
-        glPopMatrix();
-    
-        //bolo4
-        glPushMatrix();
-            glTranslatef(3.5, -7, 2);
-            glRotatef(90, 0, 1, 0);
-            aplicaTexturaM();
-            dibujaModelo();
-        glPopMatrix();
-    
-        //bolo5
-        glPushMatrix();
-            glTranslatef(-3.5, -7, 2);
-            glRotatef(90, 0, 1, 0);
-            aplicaTexturaM();
-            dibujaModelo();
-        glPopMatrix();
-    
-        //bolo6
-        glPushMatrix();
-            glTranslatef(0.4, -7, -6);
-            glRotatef(90, 0, 1, 0);
-            aplicaTexturaM();
-            dibujaModelo();
-        glPopMatrix();
-    
-        glPushMatrix();
-            glTranslatef(0,-10, 0);
-            glEnable(GL_TEXTURE_2D);
-            glEnable(GL_DEPTH_TEST);
-            usarTextura();
-            dibujaPared4c();
-    
-            usarTextura2();
-            dibujaPared1c();
-    
-            usarTextura3();
-            dibujaPared2c();
-    
-            //usarTextura4();
-            //dibujaPared3c();
-    
-            usarTextura5();
-            dibujaTapac();
-    
-            usarTextura6();
-            dibujaBase();//Base
-        glPopMatrix();
-    
-        glPushMatrix();
-            //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            aplicarMaterial(1);
-            glTranslatef(0, -6, -15);
-            glRotatef(90, 0, 1, 0);
-            glutSolidCube(5);
-        glPopMatrix();
-    glPopMatrix();
-    glutSwapBuffers();
+    glmDraw(flecha,GLUT_DOUBLE|GLM_SMOOTH | GLM_MATERIAL|GLM_TEXTURE);
 }
 
 void mouse(int button, int state, int x, int y) {
@@ -458,30 +381,130 @@ void mover(int x, int y) {
         angle2 = angle2 + (y - starty);
         startx = x;
         starty = y;
-        glutPostRedisplay();
+    }
+}
+
+static void key(unsigned char c, int x, int y) {
+    if (c == 27) {
+        exit(0);
+    }
+    if (c == 'd') {
+        bandTimer=0;
+        direccionBola=rotarFlecha;
+        printf("\n\n\n\n\nlo hago pero no muevo la bocha che\n\n\n");
+        glutTimerFunc(0, timerFunc, 0);
     }
 }
 
 void init(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(100, 1, 1,200);
+    gluPerspective(100, 1, 1, 2000);
     glMatrixMode(GL_MODELVIEW);
-    gluLookAt(0.0, 10,-40.0,  /* camara en (0,20,60) */
+    gluLookAt(0.0, 10,-80.0,  /* camara en (0,20,60) */
               0,10,0,          /* mira a (x,y,z) */
               0, 1, 0);/* altura en Y (0,1,0) o en x Y (1,0,0)*/
     
-    glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    
-    glEnable(GL_TEXTURE_2D);
-    
     glClearColor(0.4, 0.7, 0.99, 1);
+}
+
+void display(void) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glutTimerFunc(50, timerFunc, 0);
+    glPushMatrix();
+        glRotatef(angle2, 1.0, 0.0, 0.0); //move mouse
+        glRotatef(angle, 0.0, 1.0, 0.0);
+
+            //bola
+            glPushMatrix();
+                glTranslatef((direccionBola/10), -6, i);
+                //glRotatef(90, 0, 1, 0);
+                aplicaTexturaBola();
+                dibujaModeloBola();
+            glPopMatrix();
     
-    float pos[4]={1,1,0,1};
-    glLightfv(GL_LIGHT0, GL_POSITION, pos);
-    glTranslatef(0, 0, -2);
+            //flecha
+            glPushMatrix();
+                glTranslatef(0, -6, -30);
+                glRotatef(rotarFlecha, 0, 1, 0);
+                glScalef(3, 1, 1);
+                aplicaTexturaFlecha();
+                dibujaModeloFlecha();
+            glPopMatrix();
+    
+            //bolo1
+            glPushMatrix();
+                glTranslatef(8, -7, 10);
+                glRotatef(90, 0, 1, 0);
+                aplicaTexturaM();
+                dibujaModelo();
+            glPopMatrix();
+    
+            //bolo2
+            glPushMatrix();
+                glTranslatef(0, -7, 10);
+                glRotatef(90, 0, 1, 0);
+                aplicaTexturaM();
+                dibujaModelo();
+            glPopMatrix();
+    
+            //bolo3
+            glPushMatrix();
+                glTranslatef(-8, -7, 10);
+                glRotatef(90, 0, 1, 0);
+                aplicaTexturaM();
+                dibujaModelo();
+            glPopMatrix();
+    
+            //bolo4
+            glPushMatrix();
+                glTranslatef(3.5, -7, 2);
+                glRotatef(90, 0, 1, 0);
+                aplicaTexturaM();
+                dibujaModelo();
+            glPopMatrix();
+    
+            //bolo5
+            glPushMatrix();
+                glTranslatef(-3.5, -7, 2);
+                glRotatef(90, 0, 1, 0);
+                aplicaTexturaM();
+                dibujaModelo();
+            glPopMatrix();
+    
+            //bolo6
+            glPushMatrix();
+                glTranslatef(0.4, -7, -6);
+                glRotatef(90, 0, 1, 0);
+                aplicaTexturaM();
+                dibujaModelo();
+            glPopMatrix();
+    
+            glPushMatrix();
+                glTranslatef(0,-10, 0);
+                glEnable(GL_TEXTURE_2D);
+                glEnable(GL_DEPTH_TEST);
+                usarTextura();
+                dibujaPared4c();
+    
+                usarTextura2();
+                dibujaPared1c();
+    
+                usarTextura3();
+                dibujaPared2c();
+    
+                //usarTextura4();
+                //dibujaPared3c();
+    
+                usarTextura5();
+                dibujaTapac();
+    
+                usarTextura6();
+                dibujaBase();//Base
+            glPopMatrix();
+    glPopMatrix();
+    glutPostRedisplay();
+    glutSwapBuffers();
 }
 
 int main(int argc, char **argv) {
@@ -492,23 +515,24 @@ int main(int argc, char **argv) {
     glutInitWindowPosition(200, 200);
     
     glutCreateWindow("Tarea Entorno");
-    
+    leerImagen();
     glutDisplayFunc(display);
     glutMouseFunc(mouse);
     glutMotionFunc(mover);
-    
-    //gluPerspective(40,1,1,60); //16/10=1.6   5/4=1.25
-    //glMatrixMode(GL_MODELVIEW);
+    glutKeyboardFunc(key);
     
     init();
     
-    model = glmReadOBJ("/Users/ivan/Downloads/Archivo/bowling pin/bowling_pin_000.obj");
+    model = glmReadOBJ("/Users/ivan/Downloads/bowling pin/bowling_pin_000.obj");
     glmReadMTL(model,"bowling_pin_000.mtl");
 
-    model1 = glmReadOBJ("/Users/ivan/Downloads/Archivo/Bowling ball/tinker.obj");
-    glmReadMTL(model1,"obj.mtl");
-
-    leerImagen();
+    bola = glmReadOBJ("/Users/ivan/Downloads/Bowling ball/ball.obj");
+    glmReadMTL(bola,"ball.mtl");
+    
+    flecha = glmReadOBJ("/Users/ivan/Downloads/arrow-obj/arrow.obj");
+    glmReadMTL(flecha,"arrow.mtl");
+    
     glutMainLoop();
+    
     return 0;
 }
