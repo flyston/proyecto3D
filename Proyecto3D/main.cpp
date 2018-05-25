@@ -21,6 +21,10 @@ GLfloat angle2 = 0;
 int moving, startx, starty, ferrari=0, band=1, bandTimer=1;
 int rotarFlecha=-90, direccionBola=0;
 float i=-65;
+float planoPiso[4];
+float posicionLuz[] = {10, 0, 0, 0};
+enum {X, Y, Z, W};
+enum {A, B, C, D};
 
 unsigned char * textura;
 unsigned char * textura2;
@@ -105,7 +109,7 @@ int leerImagen(){
     fclose(imagen6);
     
     FILE *imagen7;
-    imagen7=fopen("/Users/ivan/Desktop/toastmap.data","r");
+    imagen7=fopen("/Users/ivan/Desktop/bola.data","r");
     imagenTexturaBola=(unsigned char*)malloc(anchoM*altoM*3);
     if(imagen7==NULL){
         printf("Sin imagen");
@@ -176,14 +180,15 @@ void aplicaTexturaFlecha(void) {
 }
 
 // cubemap variables
-int d1=20;
-int d2=40;
-static GLint verticesPiso[4][3] = {
+int d1=40;
+int d2=80;
+
+/*static GLint verticesPiso[4][3] = {
     { -d1, 0,  -d1 },
     {  d1, 0,  -d1 },
     {  d1, 0, d1 },
     { -d1, 0, d1 },
-};
+};*/
 
 static GLint pared1Vertices[4][3] = {
     { -d1,d2, d1},
@@ -220,6 +225,64 @@ static GLint techoVertices[4][3] = {
     {  -d1,d2,d1 },
     {  d1,d2,d1},
 };
+
+static GLfloat verticesPisoP[4][3] = {
+    { -100.0, -10.0,  100.0 },
+    {  100.0, -10.0,  100.0 },
+    {  100.0, -10.0, -100.0 },
+    { -100.0, -10.0, -100.0 },
+};
+
+char *texturaP[] = {
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    "o...............",
+    
+};
+
+void texturaPiso() {
+    GLubyte floorTexture[16][16][3];
+    GLubyte *color;
+    
+    int x,y;
+    // Crear RGB para textura
+    color = (GLubyte*) floorTexture;
+    
+    for (x = 0; x < 16; x++) {
+        for (y = 0; y < 16; y++) {
+            if (texturaP[x][y] == 'x') {
+                color[0] = 255;
+                color[1] = 204;
+                color[2] = 128;
+            } else if (texturaP[x][y] == 'o') {
+                color[0] = 1;
+                color[1] = 1;
+                color[2] = 1;
+            }else {
+                color[0] =255;
+                color[1] =204;
+                color[2] =128;
+            }
+            color += 3;
+        }
+    }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, 16,16, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, floorTexture);
+}
 
 void dibujaPared1c(void) {
     glBegin(GL_QUADS);
@@ -286,7 +349,45 @@ void dibujaTapac(void) {
     glEnd();
 }
 
-void dibujaBase(void) {
+void dibujaPiso() {
+    glDisable(GL_LIGHTING);
+    
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3fv(verticesPisoP[0]);
+    glTexCoord2f(0.0, 1.0);
+    glVertex3fv(verticesPisoP[1]);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3fv(verticesPisoP[2]);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3fv(verticesPisoP[3]);
+    glEnd();
+    
+    glEnable(GL_LIGHTING);
+}
+
+/* Ecuación del plano dados 3 puntos. */
+void ecPlano(GLfloat plano[4],GLfloat v0[3], GLfloat v1[3], GLfloat v2[3]) {
+    GLfloat vec0[3], vec1[3];
+    /* Producto cruz entre 2 vectores. */
+    vec0[X] = v1[X] - v0[X];
+    vec0[Y] = v1[Y] - v0[Y];
+    vec0[Z] = v1[Z] - v0[Z];
+    
+    vec1[X] = v2[X] - v0[X];
+    vec1[Y] = v2[Y] - v0[Y];
+    vec1[Z] = v2[Z] - v0[Z];
+    
+    /* Encontrar producto cruz para A, B, y C en la ec. del plano */
+    plano[A] = vec0[Y] * vec1[Z] - vec0[Z] * vec1[Y];
+    plano[B] = -(vec0[X] * vec1[Z] - vec0[Z] * vec1[X]);
+    plano[C] = vec0[X] * vec1[Y] - vec0[Y] * vec1[X];
+    
+    plano[D] = -(plano[A] * v0[X] + plano[B] * v0[Y] + plano[C] * v0[Z]);
+}
+
+
+/*void dibujaBase(void) {
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0);
     glVertex3iv(verticesPiso[3]);
@@ -297,11 +398,7 @@ void dibujaBase(void) {
     glTexCoord2f(1, 0.0);
     glVertex3iv(verticesPiso[2]);
     glEnd();
-}
-
-void timer(int value) {
-    
-}
+}*/
 
 void timerFunc(int value) {
     if (bandTimer==1) {
@@ -319,9 +416,6 @@ void timerFunc(int value) {
                     band=1;
                 }
                 break;
-                
-            default:
-                break;
         }
     } else {
         glutTimerFunc(50, timerFunc, 0);
@@ -337,7 +431,7 @@ void dibujaModelo(){
         glRotatef(-90, 1.0, 0.0, 0.0);
     
     glmUnitize(model);
-    glmScale(model, 8.0);
+    glmScale(model, 18.0);
     
     glmDraw(model,GLUT_DOUBLE|GLM_SMOOTH | GLM_MATERIAL|GLM_TEXTURE);
 }
@@ -347,7 +441,7 @@ void dibujaModeloBola(){
         glRotatef(-90, 1.0, 0.0, 0.0);
     
     glmUnitize(bola);
-    glmScale(bola, 4.0);
+    glmScale(bola, 8.0);
     
     glmDraw(bola,GLUT_DOUBLE|GLM_SMOOTH | GLM_MATERIAL|GLM_TEXTURE);
 }
@@ -390,8 +484,11 @@ static void key(unsigned char c, int x, int y) {
     }
     if (c == 'd') {
         bandTimer=0;
-        direccionBola=rotarFlecha;
-        printf("\n\n\n\n\nlo hago pero no muevo la bocha che\n\n\n");
+        if (rotarFlecha<-90) {
+            direccionBola=65*cos(rotarFlecha);
+        } else {
+            direccionBola=-65*cos(rotarFlecha);
+        }
         glutTimerFunc(0, timerFunc, 0);
     }
 }
@@ -401,23 +498,27 @@ void init(){
     glLoadIdentity();
     gluPerspective(100, 1, 1, 2000);
     glMatrixMode(GL_MODELVIEW);
-    gluLookAt(0.0, 10,-80.0,  /* camara en (0,20,60) */
+    gluLookAt(0.0, 10,-100.0,  /* camara en (0,20,60) */
               0,10,0,          /* mira a (x,y,z) */
               0, 1, 0);/* altura en Y (0,1,0) o en x Y (1,0,0)*/
     
     glClearColor(0.4, 0.7, 0.99, 1);
+    
+    ecPlano(planoPiso, verticesPisoP[1], verticesPisoP[2], verticesPisoP[3]);//Plano para sombra
 }
 
 void display(void) {
+    printf("\n\n\n\n\n\nse desplaza %d\n\n\n\n\n\n", direccionBola);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glutTimerFunc(50, timerFunc, 0);
+    glDisable(GL_LIGHTING);
     glPushMatrix();
         glRotatef(angle2, 1.0, 0.0, 0.0); //move mouse
         glRotatef(angle, 0.0, 1.0, 0.0);
 
             //bola
             glPushMatrix();
-                glTranslatef((direccionBola/10), -6, i);
+                glTranslatef((direccionBola/10), -2, i);
                 //glRotatef(90, 0, 1, 0);
                 aplicaTexturaBola();
                 dibujaModeloBola();
@@ -434,7 +535,7 @@ void display(void) {
     
             //bolo1
             glPushMatrix();
-                glTranslatef(8, -7, 10);
+                glTranslatef(15, -2, 16);
                 glRotatef(90, 0, 1, 0);
                 aplicaTexturaM();
                 dibujaModelo();
@@ -442,7 +543,7 @@ void display(void) {
     
             //bolo2
             glPushMatrix();
-                glTranslatef(0, -7, 10);
+                glTranslatef(5, -2, 16);
                 glRotatef(90, 0, 1, 0);
                 aplicaTexturaM();
                 dibujaModelo();
@@ -450,7 +551,7 @@ void display(void) {
     
             //bolo3
             glPushMatrix();
-                glTranslatef(-8, -7, 10);
+                glTranslatef(-5, -2, 16);
                 glRotatef(90, 0, 1, 0);
                 aplicaTexturaM();
                 dibujaModelo();
@@ -458,7 +559,7 @@ void display(void) {
     
             //bolo4
             glPushMatrix();
-                glTranslatef(3.5, -7, 2);
+                glTranslatef(-15, -2, 16);
                 glRotatef(90, 0, 1, 0);
                 aplicaTexturaM();
                 dibujaModelo();
@@ -466,7 +567,7 @@ void display(void) {
     
             //bolo5
             glPushMatrix();
-                glTranslatef(-3.5, -7, 2);
+                glTranslatef(9, -2, 6);
                 glRotatef(90, 0, 1, 0);
                 aplicaTexturaM();
                 dibujaModelo();
@@ -474,7 +575,39 @@ void display(void) {
     
             //bolo6
             glPushMatrix();
-                glTranslatef(0.4, -7, -6);
+                glTranslatef(0, -2, 6);
+                glRotatef(90, 0, 1, 0);
+                aplicaTexturaM();
+                dibujaModelo();
+            glPopMatrix();
+    
+            //bolo7
+            glPushMatrix();
+                glTranslatef(-9, -2, 6);
+                glRotatef(90, 0, 1, 0);
+                aplicaTexturaM();
+                dibujaModelo();
+            glPopMatrix();
+    
+            //bolo8
+            glPushMatrix();
+                glTranslatef(5, -2, -4);
+                glRotatef(90, 0, 1, 0);
+                aplicaTexturaM();
+                dibujaModelo();
+            glPopMatrix();
+    
+            //bolo9
+            glPushMatrix();
+                glTranslatef(-5, -2, -4);
+                glRotatef(90, 0, 1, 0);
+                aplicaTexturaM();
+                dibujaModelo();
+            glPopMatrix();
+    
+            //bolo10
+            glPushMatrix();
+                glTranslatef(0, -2, -14);
                 glRotatef(90, 0, 1, 0);
                 aplicaTexturaM();
                 dibujaModelo();
@@ -499,10 +632,20 @@ void display(void) {
                 usarTextura5();
                 dibujaTapac();
     
+                /*usarTextura6();
+                dibujaBase();//Base*/
+            glPopMatrix();
+    
+            glPushMatrix();
+                //glLightfv(GL_LIGHT0, GL_POSITION, posicionLuz);
+                //glEnable(GL_BLEND);
+                //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glColor4f(1.0, 1.0, 1.0, 0.6);
                 usarTextura6();
-                dibujaBase();//Base
+                dibujaPiso();
             glPopMatrix();
     glPopMatrix();
+    glEnable(GL_LIGHTING);
     glutPostRedisplay();
     glutSwapBuffers();
 }
