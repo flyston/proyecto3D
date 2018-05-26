@@ -402,10 +402,12 @@ void ecPlano(GLfloat plano[4],GLfloat v0[3], GLfloat v1[3], GLfloat v2[3]) {
 
 void timerFunc(int value) {
     if (bandTimer==1) {
+        printf("");
         glutTimerFunc(50, timerFunc, 0);
         switch (band) {
             case 1:
                 rotarFlecha-=1;
+
                 if (rotarFlecha<-110) {
                     band=0;
                 }
@@ -484,10 +486,10 @@ static void key(unsigned char c, int x, int y) {
     }
     if (c == 'd') {
         bandTimer=0;
-        if (rotarFlecha<-90) {
+        if (rotarFlecha<-110) {
             direccionBola=65*cos(rotarFlecha);
         } else {
-            direccionBola=-65*cos(rotarFlecha);
+            direccionBola=-65*sin(rotarFlecha);
         }
         glutTimerFunc(0, timerFunc, 0);
     }
